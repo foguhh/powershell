@@ -1,3 +1,8 @@
+$taskName = "USBDetectScript"
+Stop-ScheduledTask -TaskName $taskName
+Start-Sleep -Seconds 3
+
+
 # Declara variaveis 
 $global:EmailFrom = "a061423049123@hotmail.com"
 $global:EmailTo = "a061423049123@hotmail.com"
@@ -46,3 +51,24 @@ function sendMail {
 if (sendMail) {
     write-host "`n[+] Email sent to -> $global:EmailTo [+]`n"
 }
+
+
+
+Start-Sleep -Seconds 3
+
+# Specify the file path
+$filePath = "C:\Windows\Martelo\usb-log.txt"
+
+# Check if the file exists before attempting to delete
+if (Test-Path $filePath) {
+    # Delete the file
+    Remove-Item -Path $filePath -Force
+    Write-Host "File 'usb-log.txt' deleted successfully."
+} else {
+    Write-Host "File 'usb-log.txt' not found."
+}
+
+
+
+
+Start-ScheduledTask -TaskName $taskName
