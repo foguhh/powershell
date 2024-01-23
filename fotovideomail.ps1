@@ -23,18 +23,18 @@ Write-Host "Video guardado: $tempVideoFile"
 
 
 
-# Declara variaveis 
+# Declare global variables
 $global:EmailFrom = "a061423049123@hotmail.com"
 $global:EmailTo = "a061423049123@hotmail.com"
 $global:Password = "SimplePassword123"
-$global:Subject = "Login Failed"
-$global:Body = "There was a failed login attempt on your computer"
+$global:Subject = "Fail Login"
+$global:Body = "Failed Login attempt"
 $global:SMTPServer = "smtp.outlook.com"
 $global:SMTPClient = New-Object Net.Mail.SmtpClient($global:SMTPServer, 587)
 $global:SMTPClient.EnableSsl = $true
 $global:SMTPClient.Credentials = New-Object System.Net.NetworkCredential($global:EmailFrom, $global:Password)
 
-# cria o MailMessage object
+# Create a MailMessage object
 function createMailMessage {
     # Use global variables
     $global:MailMessage = New-Object Net.Mail.MailMessage
@@ -44,34 +44,34 @@ function createMailMessage {
     $global:MailMessage.Body = $global:Body
 }
 
-# cria o attachment
+# Create an Attachment
 function createAttachment {
     createMailMessage
-    # adiciona os attachments ao mail (foto e video)
-    $file = "C:\Windows\Martelo\captured_image.jpg"
-    $Attachment = New-Object Net.Mail.Attachment($file)
+    # Create an Attachment object and add it to the MailMessage
+    $Attachment = New-Object Net.Mail.Attachment($savePath)
 
-    $file2 = "C:\Windows\Martelo\video.mp4"
-    $Attachment2 = New-Object Net.Mail.Attachment($file2)
+    $Attachment2 = New-Object Net.Mail.Attachment($tempVideoFile)
     
     $global:MailMessage.Attachments.Add($Attachment)
     $global:MailMessage.Attachments.Add($Attachment2)
 }
 
-# envia o mail
+# Send the email
 function sendMail {
     createAttachment
     try {
         $global:SMTPClient.Send($global:MailMessage)
         return $true
     } catch {
-        write-host "[+] Error sending Email to $global:EmailTo [+]"
-        return false
+        #cls
+        write-host "`n[+] Error sending Email to $global:EmailTo [+]`n"
+        return $false
     }
 }
 
-# iniciar o envio do mail
+# Call the sendMail function to initiate the process
 
 if (sendMail) {
+    #cls
     write-host "`n[+] Email sent to -> $global:EmailTo [+]`n"
 }
