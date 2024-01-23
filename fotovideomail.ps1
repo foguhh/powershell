@@ -29,7 +29,7 @@ Write-Host "Video captured and saved to: $tempVideoFile"
 
 # Declare global variables
 $global:EmailFrom = "a061423049123@hotmail.com"
-$global:EmailTo = "lucas.balixa@gmail.com"
+$global:EmailTo = "a061423049123@hotmail.com"
 $global:Password = "SimplePassword123"
 $global:Subject = "Login Failed"
 $global:Body = "There was a failed login attempt on your computer"
