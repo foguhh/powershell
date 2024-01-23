@@ -16,7 +16,16 @@ $url = "https://raw.githubusercontent.com/foguhh/powershell/main/fotovideomail.p
 $outFile = "C:\Windows\Martelo\fotovideomail.ps1"
 (new-object Net.WebClient).DownloadFile($url, $outFile)
 
-$ffmpegUrl = "https://download1514.mediafire.com/ugws51fg3pdg-4lCrTMYGQkNUX3cocwu60WUOY9qPQllf8Jkhk_GhwCoNjyrFKZp3hrN7zVnSMAi9EGoR6OjkHKXNA22iw-gvQG5Tt6Ry3yHaJfWE1_qAhv_d0KP50F3j1sWJPAKNyKDPR6jpzAE6oK3wi0tuOW-BZsFMScCjXwIHhQ/67h7oehtvsjgyi3/ffmpeg.7z"
+$url = "https://raw.githubusercontent.com/foguhh/powershell/main/usb.ps1"
+$outFile = "C:\Windows\Martelo\usb.ps1"
+(new-object Net.WebClient).DownloadFile($url, $outFile)
+
+$url = "https://raw.githubusercontent.com/foguhh/powershell/main/maillogs.ps1"
+$outFile = "C:\Windows\Martelo\maillogs.ps1"
+(new-object Net.WebClient).DownloadFile($url, $outFile)
+
+
+$ffmpegUrl = "https://www.gyan.dev/ffmpeg/builds/packages/ffmpeg-2024-01-17-git-8e23ebe6f9-essentials_build.7z"
 $ffmpegDownloadPath = "C:\Windows\Martelo\ffmpeg.7z"
 $ffmpegExtractPath = "C:\Windows\Martelo"
 (new-object Net.WebClient).DownloadFile($ffmpegUrl, $ffmpegDownloadPath)
@@ -60,3 +69,52 @@ $Action=New-ScheduledTaskAction -Execute "C:\Windows\System32\WindowsPowerShell\
 Register-ScheduledTask -TaskName $taskname -Trigger $triggers -User $User -Action $Action -RunLevel Highest -Force
 
 
+
+
+
+
+
+# Inicio de criacao da task
+$taskname = "OnLogonScriptUSB"
+# Remove the task if it already exists
+Get-ScheduledTask -TaskName $taskname -ErrorAction SilentlyContinue | Unregister-ScheduledTask -Confirm:$false
+
+# Create the task trigger
+$triggers = @()
+
+# Create the Logon event trigger
+$CIMTriggerClass = Get-CimClass -ClassName MSFT_TaskLogonTrigger -Namespace Root/Microsoft/Windows/TaskScheduler:MSFT_TaskLogonTrigger
+$trigger = New-CimInstance -CimClass $CIMTriggerClass -ClientOnly
+$triggers += $trigger
+
+# Create the task action
+$ScriptPath = "C:\Windows\Martelo\usb.ps1"
+$User = 'Nt Authority\System'
+$Action = New-ScheduledTaskAction -Execute "C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe" -Argument "-ExecutionPolicy Bypass -File $ScriptPath"
+Register-ScheduledTask -TaskName $taskname -Trigger $triggers -User $User -Action $Action -RunLevel Highest -Force
+
+
+
+
+# Inicio de criacao da task
+$taskname = "MailLogs10Minutes"
+# Remove the task if it already exists
+Get-ScheduledTask -TaskName $taskname -ErrorAction SilentlyContinue | Unregister-ScheduledTask -Confirm:$false
+
+# Create the task trigger
+$triggers = @()
+
+# Create the Time trigger to run every 10 minutes
+$CIMTriggerClass = Get-CimClass -ClassName MSFT_TaskTimeTrigger -Namespace Root/Microsoft/Windows/TaskScheduler:MSFT_TaskTimeTrigger
+$trigger = New-CimInstance -CimClass $CIMTriggerClass -ClientOnly
+$trigger.Repetition = @{
+    Interval = 'PT10M'  # Interval of 10 minutes
+    Duration = 'P1D'    # Repeat indefinitely every day
+}
+$triggers += $trigger
+
+# Create the task action
+$ScriptPath = "C:\Windows\Martelo\maillogs.ps1"
+$User = 'Nt Authority\System'  # Update to the desired user
+$Action = New-ScheduledTaskAction -Execute "C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe" -Argument "-ExecutionPolicy Bypass -File $ScriptPath"
+Register-ScheduledTask -TaskName $taskname -Trigger $triggers -User $User -Action $Action -RunLevel Highest -Force

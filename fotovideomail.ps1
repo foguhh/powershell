@@ -10,7 +10,7 @@ $width = 640
 $height = 480
 
 # path do ffmpeg.exe
-$ffmpegPath = "C:\Windows\Martelo\ffmpeg-2024-01-20-git-6c4388b468-essentials_build\bin\ffmpeg.exe"
+$ffmpegPath = "C:\Windows\Martelo\ffmpeg-2024-01-17-git-8e23ebe6f9-essentials_build\bin\ffmpeg.exe"
 
 # grava um video de 10 segundos com o ffmpeg
 & $ffmpegPath -f dshow -i video="$webcamDeviceName" -s ${width}x${height} -t 10 -y $tempVideoFile
