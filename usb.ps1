@@ -1,36 +1,45 @@
-function Get-USBDevices {
-    Get-WmiObject Win32_PnPEntity | Where-Object { $_.Caption -like "*USB*" }
+# Start transcript logging to a file
+Start-Transcript -Path "C:\Windows\Martelo\usb-log.txt" -Append
+
+# Define the query to monitor USB device connection and disconnection events
+$queryCreation = @"
+    SELECT * FROM __InstanceCreationEvent WITHIN 2
+    WHERE TargetInstance ISA 'Win32_PnPEntity'
+"@
+
+$queryDeletion = @"
+    SELECT * FROM __InstanceDeletionEvent WITHIN 2
+    WHERE TargetInstance ISA 'Win32_PnPEntity'
+"@
+
+# Register the event for device connection
+Register-WmiEvent -Query $queryCreation -Action {
+    $usbDevice = $event.SourceEventArgs.NewEvent.TargetInstance
+    if ($usbDevice.PNPClass -eq "USB") {
+        $deviceName = $usbDevice.Description
+        $timePluggedIn = Get-Date
+        Write-Host "USB Device connected: $deviceName"
+        Write-Host "Time plugged in: $timePluggedIn"
+        Write-Host "------------------------"
+    }
 }
 
-$logFilePath = "C:\Windows\Martelo\usb-log.txt"
+# Register the event for device disconnection
+Register-WmiEvent -Query $queryDeletion -Action {
+    $usbDevice = $event.SourceEventArgs.NewEvent.TargetInstance
+    if ($usbDevice.PNPClass -eq "USB") {
+        $deviceName = $usbDevice.Description
+        $timeRemoved = Get-Date
+        Write-Host "USB Device removed: $deviceName"
+        Write-Host "Time removed: $timeRemoved"
+        Write-Host "------------------------"
+    }
+}
 
-$previousDevices = Get-USBDevices
-
+# Keep the script running to continuously monitor events
 while ($true) {
-    Start-Sleep -Seconds 2
-    $currentDevices = Get-USBDevices
-
-    $newDevices = Compare-Object -ReferenceObject $previousDevices -DifferenceObject $currentDevices -Property Caption -PassThru |
-                  Where-Object { $_.SideIndicator -eq '=>' }
-
-    $removedDevices = Compare-Object -ReferenceObject $previousDevices -DifferenceObject $currentDevices -Property Caption -PassThru |
-                      Where-Object { $_.SideIndicator -eq '<=' }
-
-    if ($newDevices.Count -gt 0) {
-        foreach ($device in $newDevices) {
-            $logEntry = "USB device plugged in: $($device.Caption) - $(Get-Date)"
-            Write-Host $logEntry
-            $logEntry | Out-File -Append -FilePath $logFilePath
-        }
-    }
-
-    if ($removedDevices.Count -gt 0) {
-        foreach ($device in $removedDevices) {
-            $logEntry = "USB device unplugged: $($device.Caption) - $(Get-Date)"
-            Write-Host $logEntry
-            $logEntry | Out-File -Append -FilePath $logFilePath
-        }
-    }
-
-    $previousDevices = $currentDevices
+    Start-Sleep -Seconds 1
 }
+
+# Stop transcript logging
+Stop-Transcript
