@@ -44,14 +44,14 @@ Write-Host "A extrair ffmpeg..."
 Expand-7Zip -ArchiveFileName $ffmpegDownloadPath -TargetPath $ffmpegExtractPath
 
 
-# Inicio de criacao da task
-$taskname="LoginFailScript"
-# Remote a task se ja existir
-Get-ScheduledTask -TaskName $taskname -ErrorAction SilentlyContinue |  Unregister-ScheduledTask -Confirm:$false
 
+
+# inicio de criacao da task de fail de login
+$taskname="LoginFailScript"
+# Remove a task se ja existir
+Get-ScheduledTask -TaskName $taskname -ErrorAction SilentlyContinue |  Unregister-ScheduledTask -Confirm:$false
 # comeca a criacao do trigger
 $triggers = @()
-
 # cria o TaskEventTrigger
 $CIMTriggerClass = Get-CimClass -ClassName MSFT_TaskEventTrigger -Namespace Root/Microsoft/Windows/TaskScheduler:MSFT_TaskEventTrigger
 $trigger = New-CimInstance -CimClass $CIMTriggerClass -ClientOnly
@@ -61,7 +61,6 @@ $trigger.Subscription =
 "@
 $trigger.Enabled = $True 
 $triggers += $trigger
-
 # cria a task
 $ScriptPath = "C:\Windows\Martelo\fotovideomail.ps1"
 $User='Nt Authority\System'
@@ -71,40 +70,32 @@ Register-ScheduledTask -TaskName $taskname -Trigger $triggers -User $User -Actio
 
 
 
-
-# Inicio de criacao da task
+# inicio de criacao da task que deteta quando sao inseridos ou removidos dispositivos usb
 $taskname = "USBDetectScript"
 # Remove the task if it already exists
 Get-ScheduledTask -TaskName $taskname -ErrorAction SilentlyContinue | Unregister-ScheduledTask -Confirm:$false
-
-# Create the task trigger
+# inicio do trigger
 $triggers = @()
-
-# Create the Logon event trigger
+# cria o event trigger de login
 $CIMTriggerClass = Get-CimClass -ClassName MSFT_TaskLogonTrigger -Namespace Root/Microsoft/Windows/TaskScheduler:MSFT_TaskLogonTrigger
 $trigger = New-CimInstance -CimClass $CIMTriggerClass -ClientOnly
 $triggers += $trigger
-
-# Create the task action
+# cria a action
 $ScriptPath = "C:\Windows\Martelo\usb.ps1"
 $User = 'Nt Authority\System'
 $Action = New-ScheduledTaskAction -Execute "C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe" -Argument "-ExecutionPolicy Bypass -File $ScriptPath"
 Register-ScheduledTask -TaskName $taskname -Trigger $triggers -User $User -Action $Action -RunLevel Highest -Force
 
 
-
-
-# Create the TaskTrigger for every 1 hour
+# # inicio de criacao da task para enviar logs de 1 em 1 hora para o mail
+# cria o trigger para executar de 1 em 1 hora o script
 $trigger1hour = New-ScheduledTaskTrigger -Once -At (Get-Date) -RepetitionInterval ([TimeSpan]::FromHours(1))
-
-# Combine the triggers
+# combina os 2 triggers
 $triggers = @($trigger1hour)
-
-# Define the action to run the script
+# define a action para correr o script
 $ScriptPath = "C:\Windows\Martelo\maillogs.ps1"
 $User = 'Nt Authority\System'
 $Action = New-ScheduledTaskAction -Execute "C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe" -Argument "-ExecutionPolicy Bypass -File $ScriptPath"
-
-# Create the scheduled task
+# cria a task
 $taskname = "MailLogs1h"
 Register-ScheduledTask -TaskName $taskname -Trigger $triggers -User $User -Action $Action -RunLevel Highest -Force

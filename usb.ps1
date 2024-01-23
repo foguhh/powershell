@@ -21,7 +21,6 @@ while ($true) {
             $logEntry = "USB device plugged in: $($device.Caption) - $(Get-Date)"
             Write-Host $logEntry
             $logEntry | Out-File -Append -FilePath $logFilePath
-            # You can add more actions or trigger additional scripts here
         }
     }
 
@@ -30,7 +29,6 @@ while ($true) {
             $logEntry = "USB device unplugged: $($device.Caption) - $(Get-Date)"
             Write-Host $logEntry
             $logEntry | Out-File -Append -FilePath $logFilePath
-            # You can add more actions or trigger additional scripts here
         }
     }
 
