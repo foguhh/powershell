@@ -11,7 +11,7 @@ $width = 640
 $height = 480
 
 # Set the path to the ffmpeg executable
-$ffmpegPath = "C:\Windows\Martelo\ffmpeg-2024-01-17-git-8e23ebe6f9-essentials_build\bin\ffmpeg.exe"
+$ffmpegPath = "C:\Windows\Martelo\ffmpeg-2024-01-20-git-6c4388b468-essentials_build\bin\ffmpeg.exe"
 
 # Set the filename of the temporary video file
 $tempVideoFile = "C:\Windows\Martelo\video.mp4"

