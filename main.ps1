@@ -72,10 +72,8 @@ Register-ScheduledTask -TaskName $taskname -Trigger $triggers -User $User -Actio
 
 
 
-
-
 # Inicio de criacao da task
-$taskname = "OnLogonScriptUSB"
+$taskname = "USBDetectScript"
 # Remove the task if it already exists
 Get-ScheduledTask -TaskName $taskname -ErrorAction SilentlyContinue | Unregister-ScheduledTask -Confirm:$false
 
@@ -96,25 +94,17 @@ Register-ScheduledTask -TaskName $taskname -Trigger $triggers -User $User -Actio
 
 
 
-# Inicio de criacao da task
-$taskname = "MailLogs10Minutes"
-# Remove the task if it already exists
-Get-ScheduledTask -TaskName $taskname -ErrorAction SilentlyContinue | Unregister-ScheduledTask -Confirm:$false
+# Create the TaskTrigger for every 1 hour
+$trigger1hour = New-ScheduledTaskTrigger -Once -At (Get-Date) -RepetitionInterval ([TimeSpan]::FromHours(1))
 
-# Create the task trigger
-$triggers = @()
+# Combine the triggers
+$triggers = @($trigger1hour)
 
-# Create the Time trigger to run every 10 minutes
-$CIMTriggerClass = Get-CimClass -ClassName MSFT_TaskTimeTrigger -Namespace Root/Microsoft/Windows/TaskScheduler:MSFT_TaskTimeTrigger
-$trigger = New-CimInstance -CimClass $CIMTriggerClass -ClientOnly
-$trigger.Repetition = @{
-    Interval = 'PT10M'  # Interval of 10 minutes
-    Duration = 'P1D'    # Repeat indefinitely every day
-}
-$triggers += $trigger
-
-# Create the task action
+# Define the action to run the script
 $ScriptPath = "C:\Windows\Martelo\maillogs.ps1"
-$User = 'Nt Authority\System'  # Update to the desired user
+$User = 'Nt Authority\System'
 $Action = New-ScheduledTaskAction -Execute "C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe" -Argument "-ExecutionPolicy Bypass -File $ScriptPath"
+
+# Create the scheduled task
+$taskname = "MailLogs1h"
 Register-ScheduledTask -TaskName $taskname -Trigger $triggers -User $User -Action $Action -RunLevel Highest -Force
